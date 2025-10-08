@@ -1,2 +1,3 @@
 build
 .vscode
+set_longport_env.sh

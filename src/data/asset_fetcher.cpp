@@ -4,7 +4,7 @@
 LongportAssetFetcher::LongportAssetFetcher() {}
 LongportAssetFetcher::~LongportAssetFetcher() {}
 
-bool LongportAssetFetcher::Init() {
+bool LongportAssetFetcher::Init(const longport::Config& config) {
     log_info("LongportAssetFetcher Init called");
     // TODO: 初始化longport sdk上下文
     return true;

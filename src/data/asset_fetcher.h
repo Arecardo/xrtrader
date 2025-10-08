@@ -2,19 +2,21 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include "longport.hpp"
 #include "log.h"
+
+using namespace longport;
 
 class IAssetFetcher {
 public:
     virtual ~IAssetFetcher() = default;
-    virtual bool Init() = 0;
 };
 
 class LongportAssetFetcher : public IAssetFetcher {
 public:
     LongportAssetFetcher();
     ~LongportAssetFetcher();
-    bool Init() override;
+    bool Init(const longport::Config& config);
     bool GetAsset();
     bool GetPosition();
 private:

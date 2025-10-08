@@ -2,23 +2,27 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include "longport.hpp"
 #include "log.h"
+
+namespace xrtrader {
+namespace data {
 
 class IQuoteFetcher {
 public:
     virtual ~IQuoteFetcher() = default;
-    virtual bool Init() = 0;
 };
 
 class LongportQuoteFetcher : public IQuoteFetcher {
 public:
     LongportQuoteFetcher();
     ~LongportQuoteFetcher();
-    bool Init() override;
+    bool Init(const longport::Config& config);
     bool Subscribe(const std::vector<std::string>& symbols);
     bool GetQuote(const std::vector<std::string>& symbols);
 private:
     // longport sdk context members
-    void* quote_ctx_ = nullptr;
-    void* trade_ctx_ = nullptr;
+    longport::quote::QuoteContext _quote_ctx;
 };
+} // namespace data
+} // namespace xrtrader
