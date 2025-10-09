@@ -1,3 +1,4 @@
 build
 .vscode
 set_longport_env.sh
+third/longport_sdk/libs
