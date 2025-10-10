@@ -1,26 +1,31 @@
 #pragma once
-#include <string>
-#include <vector>
-#include <memory>
-#include "longport.hpp"
-#include "log.h"
 
-using namespace longport;
+#include "longport.hpp"
+#include <future>
+
+namespace xrtrader {
+namespace data {
 
 class IAssetFetcher {
 public:
     virtual ~IAssetFetcher() = default;
+    virtual bool Init(const longport::Config& config) = 0;
+    virtual bool GetAsset() = 0;
+    virtual bool GetPosition() = 0;
 };
 
 class LongportAssetFetcher : public IAssetFetcher {
 public:
     LongportAssetFetcher();
     ~LongportAssetFetcher();
-    bool Init(const longport::Config& config);
-    bool GetAsset();
-    bool GetPosition();
+    bool Init(const longport::Config& config) override;
+    bool GetAsset() override;
+    bool GetPosition() override;
+
 private:
     // longport sdk context members
-    void* quote_ctx_ = nullptr;
-    void* trade_ctx_ = nullptr;
+    longport::trade::TradeContext _trade_ctx;
 };
+
+} // namespace data
+} // namespace xrtrader
