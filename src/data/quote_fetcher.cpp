@@ -33,7 +33,25 @@ bool LongportQuoteFetcher::Init(const longport::Config& config) {
 
 bool LongportQuoteFetcher::Subscribe(const std::vector<std::string>& symbols) {
     log_info("Subscribe called, symbols size: {}", symbols.size());
-    // TODO: 调用longport sdk订阅行情
+    
+    if (symbols.empty()) {
+        log_warn("No symbols provided for subscription");
+        return false;
+    }
+
+    _quote_ctx.set_on_quote([](auto event) {
+        log_info("Received quote for symbol: {}, timestamp: {}, last_done: {}, open: {}, high: {}, low: {}, volume: {}, turnover: {}",
+                 event->symbol, event->timestamp, (double)event->last_done, (double)event->open,
+                 (double)event->high, (double)event->low, event->volume, (double)event->turnover);
+    });
+
+    _quote_ctx.subscribe(symbols, longport::quote::SubFlags::QUOTE(), true, [](auto res) {
+      if (!res) {
+        log_error("failed to subscribe quote: {}", res.status().message());
+        return;
+      }
+    });
+    
     return true;
 }
 
