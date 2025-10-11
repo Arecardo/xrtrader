@@ -71,6 +71,24 @@ bool LongportAssetFetcher::GetAsset() {
 
 bool LongportAssetFetcher::GetPosition() {
     log_info("GetPosition called");
+    const std::optional<longport::trade::GetStockPositionsOptions> opts = std::nullopt;
+    _trade_ctx.stock_positions(opts, [](auto res) { 
+        if (!res) {
+            log_error("Failed to get stock positions: {}", res.status().message());
+            return;
+        }
+
+        std::vector<longport::trade::StockPositionChannel> channels = res->channels;
+        log_info("Stock Position Channels size:{}", channels.size());
+        for (auto it = channels.begin(); it != channels.end(); ++it) {
+            log_info("account channle type: {}, positions size: {}", it->account_channel, it->positions.size());
+            for (auto pos_it = it->positions.begin(); pos_it != it->positions.end(); ++pos_it) {
+                log_info("symbol: {}, symbol_name: {}, quantity: {}, available_quantity: {}, cost_price: {}, market: {}",
+                         pos_it->symbol, pos_it->symbol_name, (double)pos_it->quantity, (double)pos_it->available_quantity,
+                         (double)pos_it->cost_price, static_cast<int>(pos_it->market));
+            }
+        }
+    });
     
     // 调用longport sdk获取股票持仓
     return true;
