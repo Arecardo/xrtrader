@@ -1,6 +1,7 @@
 #pragma once
 
 #include "longport.hpp"
+#include "data_store.h"
 #include <future>
 
 namespace xrtrader {
@@ -9,22 +10,21 @@ namespace data {
 class IAssetFetcher {
 public:
     virtual ~IAssetFetcher() = default;
-    virtual bool Init(const longport::Config& config) = 0;
-    virtual bool GetAsset() = 0;
-    virtual bool GetPosition() = 0;
 };
 
 class LongportAssetFetcher : public IAssetFetcher {
 public:
     LongportAssetFetcher();
     ~LongportAssetFetcher();
-    bool Init(const longport::Config& config) override;
-    bool GetAsset() override;
-    bool GetPosition() override;
+    bool Init(const longport::Config& config, std::shared_ptr<AssetDataStore> data_store);
+    bool GetAsset();
+    bool GetPosition();
 
 private:
     // longport sdk context members
     longport::trade::TradeContext _trade_ctx;
+
+    std::shared_ptr<AssetDataStore> _data_store;
 };
 
 } // namespace data

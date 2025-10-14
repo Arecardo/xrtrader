@@ -1,5 +1,6 @@
 #include "quote_fetcher.h"
-#include <spdlog/spdlog.h>
+#include "data_struct.h"
+#include "log.h"
 
 namespace xrtrader {
 namespace data {
@@ -7,12 +8,20 @@ namespace data {
 LongportQuoteFetcher::LongportQuoteFetcher() {}
 LongportQuoteFetcher::~LongportQuoteFetcher() {}
 
-bool LongportQuoteFetcher::Init(const longport::Config& config) {
+bool LongportQuoteFetcher::Init(const longport::Config& config, std::shared_ptr<QuoteDataStore> data_store) {
     log_info("LongportQuoteFetcher Init");
     if (_quote_ctx.ref_count() > 0)
     {
         log_warn("QuoteContext already initialized");
         return true;
+    }
+
+    if (data_store == nullptr) {
+        log_error("Data store is null");
+        return false;
+    }
+    else {
+        _data_store = data_store;
     }
 
     longport::quote::QuoteContext::create(config, [this](auto res) {
@@ -43,6 +52,16 @@ bool LongportQuoteFetcher::Subscribe(const std::vector<std::string>& symbols) {
         log_info("Received quote for symbol: {}, timestamp: {}, last_done: {}, open: {}, high: {}, low: {}, volume: {}, turnover: {}",
                  event->symbol, event->timestamp, (double)event->last_done, (double)event->open,
                  (double)event->high, (double)event->low, event->volume, (double)event->turnover);
+        
+        // Store the quote data
+        auto quote_data = std::make_shared<SecurityQuoteData>();
+        quote_data->symbol = event->symbol;
+        quote_data->last_price = (double)event->last_done;
+        quote_data->open = (double)event->open;
+        quote_data->high = (double)event->high;
+        quote_data->low = (double)event->low;
+        quote_data->volume = event->volume;
+        quote_data->timestamp = std::chrono::system_clock::from_time_t(event->timestamp);
     });
 
     _quote_ctx.subscribe(symbols, longport::quote::SubFlags::QUOTE(), true, [](auto res) {

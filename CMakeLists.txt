@@ -17,6 +17,7 @@ include_directories(
 # Source files
 set(SRC_FILES
 	src/main.cpp
+	src/data/data_store.cpp
 	src/data/asset_fetcher.cpp
 	src/data/quote_fetcher.cpp
 )

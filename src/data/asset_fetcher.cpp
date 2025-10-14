@@ -1,4 +1,5 @@
 #include "asset_fetcher.h"
+#include "data_struct.h"
 #include "log.h"
 #include "longport.hpp"
 
@@ -8,8 +9,22 @@ namespace data {
 LongportAssetFetcher::LongportAssetFetcher() {}
 LongportAssetFetcher::~LongportAssetFetcher() {}
 
-bool LongportAssetFetcher::Init(const longport::Config& config) {
+bool LongportAssetFetcher::Init(const longport::Config& config, std::shared_ptr<AssetDataStore> data_store) {
     log_info("LongportAssetFetcher Init called");
+    if (_trade_ctx.ref_count() > 0)
+    {
+        log_warn("TradeContext already initialized");
+        return true;
+    }
+
+    if (!data_store) {
+        log_error("Data store is null");
+        return false;
+    }
+    else
+    {
+        _data_store = data_store;
+    }
     
     // 使用信号量等待初始化完成
     std::mutex mtx;
@@ -61,7 +76,13 @@ bool LongportAssetFetcher::GetAsset() {
         
         log_info("Account Balance size:{}", res->size());
 
+        std::vector<AccountBalance> balances;
         for (auto it = res->begin(); it != res->end(); ++it) {
+            AccountBalance balance;
+            balance.currency = it->currency;
+            balance.cash_balance = (double)it->total_cash;
+            balance.timestamp = std::chrono::system_clock::now();
+            
             log_info("Total cash: {}, currency: {}", (double)it->total_cash, it->currency);
         }
     });
