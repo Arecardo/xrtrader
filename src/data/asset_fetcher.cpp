@@ -30,12 +30,14 @@ bool LongportAssetFetcher::Init(const longport::Config& config, std::shared_ptr<
     std::mutex mtx;
     std::condition_variable cv;
     bool initialized = false;
+    uint64_t error_code = 0;
     std::string error_message;
     
     // 初始化longport sdk交易上下文
-    longport::trade::TradeContext::create(config, [this, &mtx, &cv, &initialized, &error_message](auto res) {
+    longport::trade::TradeContext::create(config, [this, &mtx, &cv, &initialized, &error_code, &error_message](auto res) {
         std::lock_guard<std::mutex> lock(mtx);
         if (!res) {
+            error_code = res.status().code();
             error_message = res.status().message();
             initialized = true;
             cv.notify_one();
@@ -54,7 +56,7 @@ bool LongportAssetFetcher::Init(const longport::Config& config, std::shared_ptr<
     }
     
     if (!error_message.empty()) {
-        log_error("Failed to create trade context: {}", error_message);
+        log_error("Failed to create trade context. error_code:{}, error_info:{}", error_code, error_message);
         return false;
     }
     

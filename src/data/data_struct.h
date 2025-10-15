@@ -29,6 +29,19 @@ struct SecurityQuoteData {
     double price_change() const { 
         return open != 0.0 ? (last_price - open) / open : 0.0; 
     }
+
+    std::string to_string() const {
+        return "Symbol: " + symbol + 
+               ", Last Price: " + std::to_string(last_price) + 
+               ", Volume: " + std::to_string(volume) + 
+               ", High: " + std::to_string(high) + 
+               ", Low: " + std::to_string(low) + 
+               ", Open: " + std::to_string(open) + 
+               ", Bid Price: " + std::to_string(bid_price) + 
+               ", Ask Price: " + std::to_string(ask_price) + 
+               ", Bid Volume: " + std::to_string(bid_volume) + 
+               ", Ask Volume: " + std::to_string(ask_volume);
+    }
 };
 
 // 历史K线数据结构

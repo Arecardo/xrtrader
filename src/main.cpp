@@ -41,7 +41,13 @@ int main() {
     }
     std::vector<std::string> symbols = {"TSLA.US"};
     quote_fetcher.Subscribe(symbols);
-    quote_fetcher.GetQuote(symbols);
+    while (std::cin.get() != 'q') {
+        auto curr_quote_data = quote_data_store->get_latest_quote("TSLA.US");
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        if (curr_quote_data) {
+            log_info("最新行情: {}", curr_quote_data->to_string());
+        }
+    }
 
     std::cin.get();
     log_info("测试完成");

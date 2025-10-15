@@ -20,7 +20,9 @@ public:
     ~LongportQuoteFetcher();
     bool Init(const longport::Config& config, std::shared_ptr<QuoteDataStore> quote_store);
     bool Subscribe(const std::vector<std::string>& symbols);
+    bool SubscribeCandlestick(const std::string& symbol, longport::quote::Period period);
     bool GetQuote(const std::vector<std::string>& symbols);
+    bool GetCandlestick(const std::string& symbol, longport::quote::Period period);
 private:
     // longport sdk context members
     longport::quote::QuoteContext _quote_ctx;
